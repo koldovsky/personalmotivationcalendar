@@ -17,15 +17,15 @@ export default function ThemeSwitch() {
     return (
         <button
             onClick={handleThemeChange}
-            className="p-2 rounded-full hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             title={`Current theme: ${theme}. Click to switch.`}
         >
             {theme === 'light' ? (
-                <SunIcon className="w-5 h-5 text-gray-300 dark:text-gray-700" />
+                <SunIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             ) : theme === 'dark' ? (
-                <MoonIcon className="w-5 h-5 text-gray-300 dark:text-gray-700" />
+                <MoonIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             ) : (
-                <ComputerDesktopIcon className="w-5 h-5 text-gray-300 dark:text-gray-700" />
+                <ComputerDesktopIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             )}
         </button>
     );

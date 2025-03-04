@@ -60,7 +60,7 @@ export default function CalendarGrid({ userData, onReset }: CalendarGridProps) {
 
         // Clear canvas with theme-aware background
         const isDarkMode = document.documentElement.classList.contains('dark');
-        ctx.fillStyle = isDarkMode ? '#ffffff' : '#000000';
+        ctx.fillStyle = isDarkMode ? '#000000' : '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Draw cells with theme-aware colors
@@ -71,11 +71,11 @@ export default function CalendarGrid({ userData, onReset }: CalendarGridProps) {
             const y = padding + (row * cellSize);
 
             if (day.isToday) {
-                ctx.fillStyle = isDarkMode ? '#1f2937' : '#e5e7eb'; // gray-800 : gray-200
+                ctx.fillStyle = isDarkMode ? '#e5e7eb' : '#1f2937'; // gray-200 : gray-800
             } else if (day.isPast) {
-                ctx.fillStyle = isDarkMode ? '#4b5563' : '#9ca3af'; // gray-600 : gray-400
+                ctx.fillStyle = isDarkMode ? '#9ca3af' : '#4b5563'; // gray-400 : gray-600
             } else {
-                ctx.fillStyle = isDarkMode ? '#d1d5db' : '#374151'; // gray-300 : gray-700
+                ctx.fillStyle = isDarkMode ? '#374151' : '#d1d5db'; // gray-700 : gray-300
             }
 
             const gap = 1;
@@ -158,7 +158,7 @@ export default function CalendarGrid({ userData, onReset }: CalendarGridProps) {
     };
 
     return (
-        <div className="w-full h-screen p-4 flex flex-col bg-black dark:bg-white text-white dark:text-black">
+        <div className="w-full h-screen p-4 flex flex-col bg-white dark:bg-gray-900 text-black dark:text-white">
             <div className="mb-4">
                 <div className="flex justify-between items-center mb-2">
                     <h2 className="text-2xl font-bold">Your Life Calendar</h2>
@@ -166,22 +166,22 @@ export default function CalendarGrid({ userData, onReset }: CalendarGridProps) {
                         <ThemeSwitch />
                         <button
                             onClick={onReset}
-                            className="px-4 py-2 bg-gray-700 dark:bg-gray-300 text-white dark:text-black rounded hover:bg-gray-600 dark:hover:bg-gray-400 transition-colors"
+                            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                         >
                             Change Settings
                         </button>
                     </div>
                 </div>
-                <p className="text-lg mb-2">
+                <p>
                     Expected life: {userData.lifeExpectancy} years ({userData.gender} in {userData.country})
                 </p>
-                <div className="w-full bg-gray-800 dark:bg-gray-200 rounded-full h-2.5">
+                <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2.5">
                     <div
-                        className="bg-gray-500 dark:bg-gray-600 h-2.5 rounded-full transition-all duration-500"
+                        className="bg-gray-400 dark:bg-gray-500 h-2.5 rounded-full transition-all duration-500"
                         style={{ width: `${calculateProgress()}%` }}
                     ></div>
                 </div>
-                <p className="text-sm text-gray-400 dark:text-gray-600 mt-2">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                     Progress: {calculateProgress().toFixed(1)}% of your expected life
                 </p>
             </div>

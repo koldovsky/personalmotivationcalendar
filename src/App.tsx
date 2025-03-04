@@ -31,7 +31,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-gray-900 dark:bg-gray-100">
+      <div className="min-h-screen bg-white dark:bg-gray-900">
         {userData ? (
           <CalendarGrid userData={userData} onReset={handleReset} />
         ) : (
