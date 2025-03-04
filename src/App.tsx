@@ -10,22 +10,30 @@ function App() {
   useEffect(() => {
     const savedData = localStorage.getItem('userData')
     if (savedData) {
-      setUserData(JSON.parse(savedData))
+      const data = JSON.parse(savedData)
+      setUserData({
+        ...data,
+        birthDate: new Date(data.birthDate)
+      })
     }
   }, [])
 
-  const handleSetupSubmit = (data: UserData) => {
+  const handleSubmit = (data: UserData) => {
+    localStorage.setItem('userData', JSON.stringify(data))
     setUserData(data)
   }
 
+  const handleReset = () => {
+    localStorage.removeItem('userData')
+    setUserData(null)
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {!userData ? (
-        <div className="container mx-auto py-8">
-          <SetupForm onSubmit={handleSetupSubmit} />
-        </div>
+    <div className="min-h-screen bg-gray-900">
+      {userData ? (
+        <CalendarGrid userData={userData} onReset={handleReset} />
       ) : (
-        <CalendarGrid userData={userData} />
+        <SetupForm onSubmit={handleSubmit} />
       )}
     </div>
   )

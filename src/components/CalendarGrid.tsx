@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { format, isBefore, isToday, addDays, startOfDay } from 'date-fns';
+import { format, isBefore, isToday, addDays, startOfDay, differenceInYears, differenceInMonths } from 'date-fns';
 import { UserData, DayData } from '../types';
 
 interface CalendarGridProps {
     userData: UserData;
+    onReset: () => void;
 }
 
-export default function CalendarGrid({ userData }: CalendarGridProps) {
+export default function CalendarGrid({ userData, onReset }: CalendarGridProps) {
     const [days, setDays] = useState<DayData[]>([]);
     const [currentDate] = useState(startOfDay(new Date()));
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -132,10 +133,28 @@ export default function CalendarGrid({ userData }: CalendarGridProps) {
         return (pastDays / days.length) * 100;
     };
 
+    const calculateAge = (birthDate: Date, targetDate: Date) => {
+        const totalMonths = differenceInMonths(targetDate, birthDate);
+        const years = Math.floor(totalMonths / 12);
+        const months = totalMonths % 12;
+        return { years, months };
+    };
+
     return (
         <div className="w-full h-screen p-4 flex flex-col bg-black text-white">
             <div className="mb-4">
-                <h2 className="text-2xl font-bold mb-2">Your Life Calendar</h2>
+                <div className="flex justify-between items-center mb-2">
+                    <h2 className="text-2xl font-bold">Your Life Calendar</h2>
+                    <button
+                        onClick={onReset}
+                        className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
+                    >
+                        Change Settings
+                    </button>
+                </div>
+                <p className="text-lg mb-2">
+                    Expected life: {userData.lifeExpectancy} years ({userData.gender} in {userData.country})
+                </p>
                 <div className="w-full bg-gray-800 rounded-full h-2.5">
                     <div
                         className="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
@@ -163,6 +182,19 @@ export default function CalendarGrid({ userData }: CalendarGridProps) {
                         }}
                     >
                         {format(hoveredDay.date, 'MMM d, yyyy')}
+                        <div>
+                            {(() => {
+                                const age = calculateAge(new Date(userData.birthDate), hoveredDay.date);
+                                const ageText = `Age: ${age.years} years, ${age.months} months`;
+                                if (hoveredDay.isPast) {
+                                    return ageText + " (past)";
+                                } else if (hoveredDay.isToday) {
+                                    return ageText + " (today)";
+                                } else {
+                                    return ageText + " (future)";
+                                }
+                            })()}
+                        </div>
                     </div>
                 )}
             </div>
