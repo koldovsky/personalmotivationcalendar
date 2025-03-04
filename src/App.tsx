@@ -20,13 +20,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto py-8">
-        {!userData ? (
+      {!userData ? (
+        <div className="container mx-auto py-8">
           <SetupForm onSubmit={handleSetupSubmit} />
-        ) : (
-          <CalendarGrid userData={userData} />
-        )}
-      </div>
+        </div>
+      ) : (
+        <CalendarGrid userData={userData} />
+      )}
     </div>
   )
 }
