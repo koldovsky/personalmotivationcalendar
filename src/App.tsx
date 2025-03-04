@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import SetupForm from './components/SetupForm'
 import CalendarGrid from './components/CalendarGrid'
 import { UserData } from './types'
+import { ThemeProvider } from './contexts/ThemeContext'
 import './App.css'
 
 function App() {
@@ -29,13 +30,15 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      {userData ? (
-        <CalendarGrid userData={userData} onReset={handleReset} />
-      ) : (
-        <SetupForm onSubmit={handleSubmit} />
-      )}
-    </div>
+    <ThemeProvider>
+      <div className="min-h-screen bg-gray-900 dark:bg-gray-100">
+        {userData ? (
+          <CalendarGrid userData={userData} onReset={handleReset} />
+        ) : (
+          <SetupForm onSubmit={handleSubmit} />
+        )}
+      </div>
+    </ThemeProvider>
   )
 }
 

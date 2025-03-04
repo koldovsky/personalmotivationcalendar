@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { format, isBefore, isToday, addDays, startOfDay, differenceInYears, differenceInMonths } from 'date-fns';
 import { UserData, DayData } from '../types';
+import ThemeSwitch from './ThemeSwitch';
 
 interface CalendarGridProps {
     userData: UserData;
@@ -38,51 +39,45 @@ export default function CalendarGrid({ userData, onReset }: CalendarGridProps) {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Get container dimensions
         const container = canvas.parentElement;
         if (!container) return;
 
-        // Set canvas size to match container
         canvas.width = container.clientWidth;
         canvas.height = container.clientHeight;
 
-        // Calculate optimal cell size
-        const padding = 40; // Padding around the grid
+        const padding = 40;
         const availableWidth = canvas.width - (padding * 2);
         const availableHeight = canvas.height - (padding * 2);
 
-        // Calculate grid dimensions
         const totalDays = days.length;
         const cols = Math.ceil(Math.sqrt(totalDays * (availableWidth / availableHeight)));
         const rows = Math.ceil(totalDays / cols);
 
-        // Calculate cell size to fit the grid
         const cellSize = Math.min(
             availableWidth / cols,
             availableHeight / rows
         );
 
-        // Clear canvas
-        ctx.fillStyle = '#000000';
+        // Clear canvas with theme-aware background
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        ctx.fillStyle = isDarkMode ? '#ffffff' : '#000000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw cells
+        // Draw cells with theme-aware colors
         days.forEach((day, index) => {
             const col = index % cols;
             const row = Math.floor(index / cols);
             const x = padding + (col * cellSize);
             const y = padding + (row * cellSize);
 
-            // Set color based on day status
             if (day.isToday) {
-                ctx.fillStyle = '#ef4444'; // red-500
+                ctx.fillStyle = isDarkMode ? '#1f2937' : '#e5e7eb'; // gray-800 : gray-200
             } else if (day.isPast) {
-                ctx.fillStyle = '#9ca3af'; // gray-400
+                ctx.fillStyle = isDarkMode ? '#4b5563' : '#9ca3af'; // gray-600 : gray-400
             } else {
-                ctx.fillStyle = '#dbeafe'; // blue-100
+                ctx.fillStyle = isDarkMode ? '#d1d5db' : '#374151'; // gray-300 : gray-700
             }
 
-            // Draw cell with small gap
             const gap = 1;
             ctx.fillRect(x + gap, y + gap, cellSize - (gap * 2), cellSize - (gap * 2));
         });
@@ -91,7 +86,25 @@ export default function CalendarGrid({ userData, onReset }: CalendarGridProps) {
     useEffect(() => {
         drawCalendar();
         window.addEventListener('resize', drawCalendar);
-        return () => window.removeEventListener('resize', drawCalendar);
+
+        // Listen for theme changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    drawCalendar();
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
+        return () => {
+            window.removeEventListener('resize', drawCalendar);
+            observer.disconnect();
+        };
     }, [drawCalendar]);
 
     const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -140,28 +153,35 @@ export default function CalendarGrid({ userData, onReset }: CalendarGridProps) {
         return { years, months };
     };
 
+    const calculateDayPercentage = (dayIndex: number) => {
+        return ((dayIndex + 1) / days.length * 100).toFixed(1);
+    };
+
     return (
-        <div className="w-full h-screen p-4 flex flex-col bg-black text-white">
+        <div className="w-full h-screen p-4 flex flex-col bg-black dark:bg-white text-white dark:text-black">
             <div className="mb-4">
                 <div className="flex justify-between items-center mb-2">
                     <h2 className="text-2xl font-bold">Your Life Calendar</h2>
-                    <button
-                        onClick={onReset}
-                        className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
-                    >
-                        Change Settings
-                    </button>
+                    <div className="flex items-center gap-4">
+                        <ThemeSwitch />
+                        <button
+                            onClick={onReset}
+                            className="px-4 py-2 bg-gray-700 dark:bg-gray-300 text-white dark:text-black rounded hover:bg-gray-600 dark:hover:bg-gray-400 transition-colors"
+                        >
+                            Change Settings
+                        </button>
+                    </div>
                 </div>
                 <p className="text-lg mb-2">
                     Expected life: {userData.lifeExpectancy} years ({userData.gender} in {userData.country})
                 </p>
-                <div className="w-full bg-gray-800 rounded-full h-2.5">
+                <div className="w-full bg-gray-800 dark:bg-gray-200 rounded-full h-2.5">
                     <div
-                        className="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
+                        className="bg-gray-500 dark:bg-gray-600 h-2.5 rounded-full transition-all duration-500"
                         style={{ width: `${calculateProgress()}%` }}
                     ></div>
                 </div>
-                <p className="text-sm text-gray-400 mt-2">
+                <p className="text-sm text-gray-400 dark:text-gray-600 mt-2">
                     Progress: {calculateProgress().toFixed(1)}% of your expected life
                 </p>
             </div>
@@ -175,7 +195,7 @@ export default function CalendarGrid({ userData, onReset }: CalendarGridProps) {
                 />
                 {hoveredDay && (
                     <div
-                        className="fixed z-10 bg-white text-black px-2 py-1 rounded text-xs pointer-events-none"
+                        className="fixed z-10 bg-gray-800 dark:bg-gray-200 text-white dark:text-black px-2 py-1 rounded text-xs pointer-events-none"
                         style={{
                             left: tooltipPosition.x + 10,
                             top: tooltipPosition.y + 10
@@ -185,7 +205,9 @@ export default function CalendarGrid({ userData, onReset }: CalendarGridProps) {
                         <div>
                             {(() => {
                                 const age = calculateAge(new Date(userData.birthDate), hoveredDay.date);
-                                const ageText = `Age: ${age.years} years, ${age.months} months`;
+                                const dayIndex = days.findIndex(d => d.date.getTime() === hoveredDay.date.getTime());
+                                const percentage = calculateDayPercentage(dayIndex);
+                                const ageText = `Age: ${age.years} years, ${age.months} months (${percentage}%)`;
                                 if (hoveredDay.isPast) {
                                     return ageText + " (past)";
                                 } else if (hoveredDay.isToday) {
