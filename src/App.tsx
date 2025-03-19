@@ -32,6 +32,9 @@ function App() {
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-white dark:bg-gray-900">
+        <h1 className="text-3xl font-bold text-center py-6 text-black dark:text-white">
+          Personal Motivational Calendar
+        </h1>
         {userData ? (
           <CalendarGrid userData={userData} onReset={handleReset} />
         ) : (

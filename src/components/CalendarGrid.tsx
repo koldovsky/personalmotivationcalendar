@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { format, isBefore, isToday, addDays, startOfDay, differenceInYears, differenceInMonths } from 'date-fns';
+import { format, isBefore, isToday, addDays, startOfDay, differenceInMonths } from 'date-fns';
 import { UserData, DayData } from '../types';
 import ThemeSwitch from './ThemeSwitch';
 
